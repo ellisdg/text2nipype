@@ -17,6 +17,7 @@ def parse_args():
                              "the type of smoothing, and any templates and atlases used.")
     parser.add_argument("--workflow_file", type=str, default="workflow.py",
                         help="path to the file where the workflow will be written.")
+    parser.add_argument("--response_file", type=str, default="response.json")
     parser.add_argument("--workflow_template_file", type=str,
                         default=os.path.join(os.path.abspath(os.path.dirname(__file__)), "template_workflow.py"),
                         help="path to the file where the workflow template is stored. This file will describe what "
@@ -72,7 +73,7 @@ def ask_chat_gpt(api_key, acquisition_details, processing_details, template_work
                                  template_workflow=template_workflow)}],
                "temperature": 0
                }
-
+    print("Sending request to ChatGPT...")
     response = requests.post(url, headers=headers, json=payload)
     return response.json()
 
@@ -94,6 +95,12 @@ def read_workflow_template(path):
         return f.read()
 
 
+def write_json(response, path):
+    import json
+    with open(path, "w") as f:
+        json.dump(response, f)
+
+
 def main():
     args = parse_args()
     api_key = read_api_key(os.path.abspath(args.api_key))
@@ -102,9 +109,8 @@ def main():
     template_workflow = read_workflow_template(args.workflow_template_file)
     response = ask_chat_gpt(api_key, acquisition_details, processing_details,
                             template_workflow)
-    print(response)
+    write_json(response, args.response_file)
     code = parse_response(response)
-    print(code)
     write_workflow_file(code, args.workflow_file)
 
 
