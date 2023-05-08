@@ -86,6 +86,7 @@ def parse_response(response):
 
 
 def write_workflow_file(code, path):
+    print("Writing workflow to {path}...".format(path=path))
     with open(path, "w") as f:
         f.write(code)
 
@@ -96,6 +97,7 @@ def read_workflow_template(path):
 
 
 def write_json(response, path):
+    print("Writing response to {path}...".format(path=path))
     import json
     with open(path, "w") as f:
         json.dump(response, f)
